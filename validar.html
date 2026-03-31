@@ -1,0 +1,12 @@
+validar.htmlconst dados = {
+"RES-001": {nome: "João Silva", tipo: "Residente", status: "ATIVO"},
+"COM-001": {nome: "Mercadinho X", tipo: "Comércio", status: "ATIVO"},
+"PRES-001": {nome: "Carlos Eletricista", tipo: "Prestador", status: "INATIVO"},
+"COND-001": {nome: "Condomínio Sol", tipo: "Condômino", status: "ATIVO"}
+};div.innerHTML = `
+  <h3>${dados[id].nome}</h3>
+  <p><b>Tipo:</b> ${dados[id].tipo}</p>
+  <p class="${dados[id].status=="ATIVO"?"ativo":"inativo"}">
+    ${dados[id].status}
+  </p>
+`;
