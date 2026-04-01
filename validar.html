@@ -41,21 +41,34 @@ const dados = {
 "COND-001": {nome: "Condomínio Sol", tipo: "Condômino", status: "ATIVO"}
 };
 
+const cores = {
+"Residente": "#1e90ff",
+"Comércio": "#ff8c00",
+"Prestador": "#2ecc71",
+"Condômino": "#8e44ad"
+};
+
 const id = new URLSearchParams(window.location.search).get("id");
 const div = document.getElementById("resultado");
 
 if(dados[id]){
+const s = dados[id];
+
 div.innerHTML = `
-<h3>${dados[id].nome}</h3>
-<p><b>Tipo:</b> ${dados[id].tipo}</p>
-<p class="${dados[id].status=="ATIVO"?"ativo":"inativo"}">
-${dados[id].status}
+<h2 style="color:${cores[s.tipo]}">${s.nome}</h2>
+<p><b>Tipo:</b> ${s.tipo}</p>
+
+<p class="${s.status=="ATIVO"?"ativo":"inativo"}">
+${s.status}
+</p>
+
+<p style="font-size:18px; font-weight:bold;">
+${s.status=="ATIVO" ? "✅ AUTORIZADO" : "❌ NÃO AUTORIZADO"}
 </p>
 `;
 }else{
-div.innerHTML = "<p class='inativo'>Não encontrado</p>";
+div.innerHTML = "<p class='inativo'>❌ Não encontrado</p>";
 }
 </script>
-
 </body>
 </html>
