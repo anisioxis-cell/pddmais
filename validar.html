@@ -34,12 +34,43 @@ margin: auto;
 <div class="card" id="resultado"></div>
 
 <script>
-const dados = {
-"RES-001": {nome: "João Silva", tipo: "Residente", status: "ATIVO"},
-"COM-001": {nome: "Mercadinho X", tipo: "Comércio", status: "ATIVO"},
-"PRES-001": {nome: "Carlos Eletricista", tipo: "Prestador", status: "INATIVO"},
-"COND-001": {nome: "Condomínio Sol", tipo: "Condômino", status: "ATIVO"}
+const cores = {
+"Residente": "#1e90ff",
+"Comércio": "#ff8c00",
+"Prestador": "#2ecc71",
+"Condômino": "#8e44ad"
 };
+
+const id = new URLSearchParams(window.location.search).get("id");
+const div = document.getElementById("resultado");
+
+// 🔗 BUSCAR DADOS DA PLANILHA
+fetch("COLE_AQUI_SEU_LINK_DO_APPS_SCRIPT")
+.then(res => res.json())
+.then(dados => {
+
+  if(dados[id]){
+    const s = dados[id];
+
+    div.innerHTML = `
+    <h2 style="color:${cores[s.tipo]}">${s.nome}</h2>
+    <p><b>Tipo:</b> ${s.tipo}</p>
+
+    <p class="${s.status=="ATIVO"?"ativo":"inativo"}">
+    ${s.status}
+    </p>
+
+    <p style="font-size:18px; font-weight:bold;">
+    ${s.status=="ATIVO" ? "✅ AUTORIZADO" : "❌ NÃO AUTORIZADO"}
+    </p>
+    `;
+
+  } else {
+    div.innerHTML = "<p class='inativo'>❌ Não encontrado</p>";
+  }
+
+});
+</script>
 
 const cores = {
 "Residente": "#1e90ff",
