@@ -1,73 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Validação PDD+</title>
-
-<style>
-body {
-  font-family: Arial;
-  text-align: center;
-  padding: 40px;
-  background: linear-gradient(to bottom, #0a2540, #1e90ff);
-  color: white;
-}
-
-.card {
-  background: white;
-  color: black;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 300px;
-  margin: auto;
-}
-
-.ativo { color: green; font-weight: bold; }
-.inativo { color: red; font-weight: bold; }
-</style>
+  <title>Validação</title>
 </head>
-
 <body>
-
-<h2>Validação PDD+</h2>
-
-<div class="card" id="resultado">Carregando...</div>
+  <h2>Verificando...</h2>
 
 <script>
-const cores = {
-  "Residente": "#1e90ff",
-  "Comércio": "#ff8c00",
-  "Prestador": "#2ecc71",
-  "Condômino": "#8e44ad"
-};
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
 
-const id = new URLSearchParams(window.location.search).get("id");
-const div = document.getElementById("resultado");
+fetch(`https://script.google.com/macros/s/AKfycbximIf-OrRXsGQRKCna69_Bj9Jlhs0eeACypicE9j29DDKR82puSf-GbGleSuePV4e5ew/exec?id=${id}`)
+  .then(res => res.json())
+  .then(dados => {
 
-div.innerHTML = "Carregando...";
+    if (dados.erro) {
+      document.body.innerHTML = "<h1 style='color:red'>❌ NÃO AUTORIZADO</h1>";
+      return;
+    }
 
-// chama direto com ID
-const url = "LINK_NOVO"
-fetch(url)
-.then(res => res.json())
-.then(s => {
+    let cor = dados.status == "ATIVO" ? "green" : "red";
+    let texto = dados.status == "ATIVO" ? "✅ AUTORIZADO" : "❌ BLOQUEADO";
 
-  if (!s || !s.nome) {
-    div.innerHTML = "<p class='inativo'>❌ Não encontrado</p>";
-    return;
-  }
-
-  div.innerHTML = `
-    <h2 style="color:${cores[s.tipo]}">${s.nome}</h2>
-    <p><b>Tipo:</b> ${s.tipo}</p>
-    <p class="${s.status=="ATIVO"?"ativo":"inativo"}">${s.status}</p>
-    <p style="font-size:18px; font-weight:bold;">
-      ${s.status=="ATIVO" ? "✅ AUTORIZADO" : "❌ NÃO AUTORIZADO"}
-    </p>
-  `;
-})
-.catch(() => {
-  div.innerHTML = "<p class='inativo'>❌ Erro ao conectar com a base</p>";
-});
+    document.body.innerHTML = `
+      <h1 style="color:${cor}">${texto}</h1>
+      <p><b>Nome:</b> ${dados.nome}</p>
+      <p><b>Tipo:</b> ${dados.tipo}</p>
+      <p><b>Status:</b> ${dados.status}</p>
+    `;
+  })
+  .catch(() => {
+    document.body.innerHTML = "<h1>Erro ao consultar</h1>";
+  });
 </script>
+
+</body>
 </html>
