@@ -46,8 +46,15 @@ const div = document.getElementById("resultado");
 
 div.innerHTML = "Carregando...";
 
-// função que será chamada pelo Apps Script
-function receberDados(dados) {
+// 🔗 SEU LINK DO APPS SCRIPT
+const url = "https://script.google.com/macros/s/AKfycbxyQ6UfcVPqd-CEm90OTYGY0_htxqrp3OSsvGW5x9XVQGoDkBdCsijDxDymPQd3MWIfcA/exec";
+
+// 🔥 PROXY PARA EVITAR BLOQUEIO
+const proxy = "https://api.allorigins.win/raw?url=" + encodeURIComponent(url);
+
+fetch(proxy)
+.then(res => res.json())
+.then(dados => {
 
   if (!id) {
     div.innerHTML = "<p class='inativo'>❌ ID não informado</p>";
@@ -68,13 +75,12 @@ function receberDados(dados) {
   } else {
     div.innerHTML = "<p class='inativo'>❌ Não encontrado</p>";
   }
-}
 
-// cria script dinâmico (JSONP)
-const script = document.createElement("script");
-script.src = "https://script.google.com/macros/s/AKfycbxyQ6UfcVPqd-CEm90OTYGY0_htxqrp3OSsvGW5x9XVQGoDkBdCsijDxDymPQd3MWIfcA/exec?callback=receberDados";
-document.body.appendChild(script);
+})
+.catch(err => {
+  console.error(err);
+  div.innerHTML = "<p class='inativo'>❌ Erro ao conectar com a base</p>";
+});
 </script>
-
 </body>
 </html>
