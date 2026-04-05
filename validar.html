@@ -46,41 +46,29 @@ const div = document.getElementById("resultado");
 
 div.innerHTML = "Carregando...";
 
-// 🔗 SEU LINK DO APPS SCRIPT
-const url = "https://script.google.com/macros/s/AKfycbxyQ6UfcVPqd-CEm90OTYGY0_htxqrp3OSsvGW5x9XVQGoDkBdCsijDxDymPQd3MWIfcA/exec";
+// chama direto com ID
+const url = "https://script.google.com/macros/s/AKfycbxyQ6UfcVPqd-CEm90OTYGY0_htxqrp3OSsvGW5x9XVQGoDkBdCsijDxDymPQd3MWIfcA/exec?id=" + id;
 
-// 🔥 PROXY PARA EVITAR BLOQUEIO
-const proxy = "https://api.allorigins.win/raw?url=" + encodeURIComponent(url);
-
-fetch(proxy)
+fetch(url)
 .then(res => res.json())
-.then(dados => {
+.then(s => {
 
-  if (!id) {
-    div.innerHTML = "<p class='inativo'>❌ ID não informado</p>";
+  if (!s || !s.nome) {
+    div.innerHTML = "<p class='inativo'>❌ Não encontrado</p>";
     return;
   }
 
-  if (dados[id]) {
-    const s = dados[id];
-
-    div.innerHTML = `
-      <h2 style="color:${cores[s.tipo]}">${s.nome}</h2>
-      <p><b>Tipo:</b> ${s.tipo}</p>
-      <p class="${s.status=="ATIVO"?"ativo":"inativo"}">${s.status}</p>
-      <p style="font-size:18px; font-weight:bold;">
-        ${s.status=="ATIVO" ? "✅ AUTORIZADO" : "❌ NÃO AUTORIZADO"}
-      </p>
-    `;
-  } else {
-    div.innerHTML = "<p class='inativo'>❌ Não encontrado</p>";
-  }
-
+  div.innerHTML = `
+    <h2 style="color:${cores[s.tipo]}">${s.nome}</h2>
+    <p><b>Tipo:</b> ${s.tipo}</p>
+    <p class="${s.status=="ATIVO"?"ativo":"inativo"}">${s.status}</p>
+    <p style="font-size:18px; font-weight:bold;">
+      ${s.status=="ATIVO" ? "✅ AUTORIZADO" : "❌ NÃO AUTORIZADO"}
+    </p>
+  `;
 })
-.catch(err => {
-  console.error(err);
+.catch(() => {
   div.innerHTML = "<p class='inativo'>❌ Erro ao conectar com a base</p>";
 });
 </script>
-</body>
 </html>
