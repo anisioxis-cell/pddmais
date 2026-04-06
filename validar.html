@@ -1,36 +1,83 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Validação</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      background: #f2f2f2;
+      padding: 30px;
+    }
+
+    .card {
+      display: inline-block;
+      padding: 30px;
+      border-radius: 15px;
+      color: white;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      min-width: 300px;
+    }
+
+    .nome {
+      font-size: 22px;
+      margin: 10px 0;
+    }
+
+    .tipo {
+      font-size: 18px;
+      opacity: 0.9;
+    }
+
+    .status {
+      font-size: 26px;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+  </style>
 </head>
 <body>
-  <h2>Verificando...</h2>
+
+<h2>🔍 Validando acesso...</h2>
 
 <script>
+const url = "https://script.google.com/macros/s/AKfycbxXAUfFZn1HjwBC6qEwyBrh6pqzHwaG9Nb71x98qUa8X5ocJEyxa4zppjfZiCD-g6guHA/exec";
+
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
-fetch(`https://script.google.com/macros/s/AKfycbximIf-OrRXsGQRKCna69_Bj9Jlhs0eeACypicE9j29DDKR82puSf-GbGleSuePV4e5ew/exec?id=${id}`)
+fetch(`${url}?id=${id}`)
   .then(res => res.json())
   .then(dados => {
 
     if (dados.erro) {
-      document.body.innerHTML = "<h1 style='color:red'>❌ NÃO AUTORIZADO</h1>";
+      document.body.innerHTML = `
+        <div class="card" style="background:red">
+          <h1>❌ NÃO AUTORIZADO</h1>
+        </div>
+      `;
       return;
     }
 
-    let cor = dados.status == "ATIVO" ? "green" : "red";
-    let texto = dados.status == "ATIVO" ? "✅ AUTORIZADO" : "❌ BLOQUEADO";
+    let cor = dados.status === "ATIVO" ? "green" : "red";
+    let texto = dados.status === "ATIVO" ? "✅ AUTORIZADO" : "❌ BLOQUEADO";
 
     document.body.innerHTML = `
-      <h1 style="color:${cor}">${texto}</h1>
-      <p><b>Nome:</b> ${dados.nome}</p>
-      <p><b>Tipo:</b> ${dados.tipo}</p>
-      <p><b>Status:</b> ${dados.status}</p>
+      <div class="card" style="background:${cor}">
+        <h1>${texto}</h1>
+        <div class="nome">${dados.nome}</div>
+        <div class="tipo">${dados.tipo}</div>
+        <div class="status">${dados.status}</div>
+      </div>
     `;
   })
   .catch(() => {
-    document.body.innerHTML = "<h1>Erro ao consultar</h1>";
+    document.body.innerHTML = `
+      <div class="card" style="background:gray">
+        <h1>Erro ao consultar</h1>
+      </div>
+    `;
   });
 </script>
 
