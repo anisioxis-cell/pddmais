@@ -2,82 +2,95 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Validação</title>
+  <title>Validação de Carteirinha</title>
   <style>
     body {
-      font-family: Arial;
-      text-align: center;
-      background: #f2f2f2;
-      padding: 30px;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #dbeeff, #f5faff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
     .card {
-      display: inline-block;
+      background: white;
       padding: 30px;
-      border-radius: 15px;
-      color: white;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      min-width: 300px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      text-align: center;
+      width: 320px;
     }
 
-    .nome {
-      font-size: 22px;
-      margin: 10px 0;
+    h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: #0077cc;
     }
 
-    .tipo {
+    p {
       font-size: 18px;
-      opacity: 0.9;
+      margin: 8px 0;
     }
 
     .status {
-      font-size: 26px;
-      font-weight: bold;
       margin-top: 15px;
+      padding: 10px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .ativo {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .inativo {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .loading {
+      font-size: 18px;
+      color: #555;
     }
   </style>
 </head>
+
 <body>
 
-<h2>🔍 Validando acesso...</h2>
+<div class="card">
+  <h1>🔍 Validando...</h1>
+  <div id="conteudo" class="loading">Carregando dados...</div>
+</div>
 
 <script>
-const url = "https://script.google.com/macros/s/AKfycbxXAUfFZn1HjwBC6qEwyBrh6pqzHwaG9Nb71x98qUa8X5ocJEyxa4zppjfZiCD-g6guHA/exec";
+const urlParams = new URLSearchParams(window.location.search);
+const id = urlParams.get("id");
 
-const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
-
-fetch(`${url}?id=${id}`)
+fetch(`https://script.google.com/macros/s/SEU_SCRIPT_ID/exec?id=${id}`)
   .then(res => res.json())
   .then(dados => {
-
     if (dados.erro) {
-      document.body.innerHTML = `
-        <div class="card" style="background:red">
-          <h1>❌ NÃO AUTORIZADO</h1>
-        </div>
-      `;
+      document.getElementById("conteudo").innerHTML = "❌ Não encontrado";
       return;
     }
 
-    let cor = dados.status === "ATIVO" ? "green" : "red";
-    let texto = dados.status === "ATIVO" ? "✅ AUTORIZADO" : "❌ BLOQUEADO";
+    let statusClass = dados.status === "ATIVO" ? "ativo" : "inativo";
 
-    document.body.innerHTML = `
-      <div class="card" style="background:${cor}">
-        <h1>${texto}</h1>
-        <div class="nome">${dados.nome}</div>
-        <div class="tipo">${dados.tipo}</div>
-        <div class="status">${dados.status}</div>
+    document.querySelector("h1").innerText = "Carteirinha";
+    document.getElementById("conteudo").innerHTML = `
+      <p><strong>Nome:</strong> ${dados.nome}</p>
+      <p><strong>Tipo:</strong> ${dados.tipo}</p>
+      <div class="status ${statusClass}">
+        ${dados.status}
       </div>
     `;
   })
   .catch(() => {
-    document.body.innerHTML = `
-      <div class="card" style="background:gray">
-        <h1>Erro ao consultar</h1>
-      </div>
-    `;
+    document.getElementById("conteudo").innerHTML = "⚠️ Erro ao carregar";
   });
 </script>
 
