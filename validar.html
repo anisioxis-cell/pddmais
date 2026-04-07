@@ -1,97 +1,126 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Validação de Carteirinha</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to bottom, #dbeeff, #f5faff);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Validação</title>
 
-    .card {
-      background: white;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      text-align: center;
-      width: 320px;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  transition: background 0.4s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
-    h1 {
-      font-size: 24px;
-      margin-bottom: 10px;
-      color: #0077cc;
-    }
+/* FUNDOS */
+body.inicial {
+  background: #eef7ff;
+}
 
-    p {
-      font-size: 18px;
-      margin: 8px 0;
-    }
+body.ativo {
+  background: #eafaf1;
+}
 
-    .status {
-      margin-top: 15px;
-      padding: 10px;
-      border-radius: 10px;
-      font-weight: bold;
-      font-size: 18px;
-    }
+body.inativo {
+  background: #fdeeee;
+}
 
-    .ativo {
-      background: #d4edda;
-      color: #155724;
-    }
+/* CARD */
+.card {
+  width: 92%;
+  max-width: 420px;
+  background: white;
+  border-radius: 22px;
+  padding: 30px 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  text-align: center;
+}
 
-    .inativo {
-      background: #f8d7da;
-      color: #721c24;
-    }
+/* STATUS */
+.status {
+  font-size: 30px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
 
-    .loading {
-      font-size: 18px;
-      color: #555;
-    }
-  </style>
+/* CORES */
+.ok {
+  color: #1e7e34;
+}
+
+.no {
+  color: #c82333;
+}
+
+/* NOME */
+.nome {
+  font-size: 26px;
+  margin: 15px 0;
+}
+
+/* TIPO */
+.tipo {
+  font-size: 20px;
+  color: #555;
+}
+
+/* TEXTO */
+.loading {
+  font-size: 20px;
+  color: #666;
+}
+</style>
 </head>
 
-<body>
+<body class="inicial">
 
 <div class="card">
-  <h1>🔍 Validando...</h1>
-  <div id="conteudo" class="loading">Carregando dados...</div>
+  <div id="conteudo" class="loading">🔄 Verificando...</div>
 </div>
 
 <script>
 const urlParams = new URLSearchParams(window.location.search);
 const id = urlParams.get("id");
 
-fetch(`https://script.google.com/macros/s/SEU_SCRIPT_ID/exec?id=${id}`)
-  .then(res => res.json())
-  .then(dados => {
-    if (dados.erro) {
-      document.getElementById("conteudo").innerHTML = "❌ Não encontrado";
-      return;
-    }
+fetch(`https://script.google.com/macros/s/AKfycbxXAUfFZn1HjwBC6qEwyBrh6pqzHwaG9Nb71x98qUa8X5ocJEyxa4zppjfZiCD-g6guHA/exec?id=${id}`)
+.then(res => res.json())
+.then(dados => {
 
-    let statusClass = dados.status === "ATIVO" ? "ativo" : "inativo";
+  if (dados.erro) {
+    document.body.className = "inativo";
+    document.getElementById("conteudo").innerHTML =
+      `<div class="status no">❌ NÃO ENCONTRADO</div>`;
+    return;
+  }
 
-    document.querySelector("h1").innerText = "Carteirinha";
+  if (dados.status === "ATIVO") {
+    document.body.className = "ativo";
+
     document.getElementById("conteudo").innerHTML = `
-      <p><strong>Nome:</strong> ${dados.nome}</p>
-      <p><strong>Tipo:</strong> ${dados.tipo}</p>
-      <div class="status ${statusClass}">
-        ${dados.status}
-      </div>
+      <div class="status ok">✔ DESCONTO LIBERADO</div>
+      <div class="nome">${dados.nome}</div>
+      <div class="tipo">${dados.tipo}</div>
     `;
-  })
-  .catch(() => {
-    document.getElementById("conteudo").innerHTML = "⚠️ Erro ao carregar";
-  });
+  } else {
+    document.body.className = "inativo";
+
+    document.getElementById("conteudo").innerHTML = `
+      <div class="status no">❌ NÃO AUTORIZADO</div>
+      <div class="nome">${dados.nome}</div>
+      <div class="tipo">${dados.tipo}</div>
+    `;
+  }
+
+})
+.catch(() => {
+  document.body.className = "inativo";
+  document.getElementById("conteudo").innerHTML =
+    `<div class="status no">⚠️ ERRO</div>`;
+});
 </script>
 
 </body>
