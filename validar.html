@@ -99,9 +99,12 @@ function simularLeitura() {
   let texto = dados.status === "ATIVO" ? "✔ DESCONTO LIBERADO" : "❌ NÃO AUTORIZADO";
 
   document.getElementById("conteudo").innerHTML = `
-    <div class="status ${classe}">${texto}</div>
-    <div class="nome">${dados.nome}</div>
-    <div class="tipo">${dados.tipo}</div>
+    <div class="status no">❌ SEM DIREITO A BENEFÍCIOS</div>
+<div class="nome">Maria Oliveira</div>
+<div class="tipo">Condômino</div>
+<div style="font-size:18px; margin-top:10px; color:#a00;">
+  Associação inativa
+</div>
   `;
 }
 </script>
