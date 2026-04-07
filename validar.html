@@ -3,30 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Validação</title>
+<title>Demonstração</title>
 
 <style>
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  transition: background 0.4s;
+  background: #f2f9ff; /* azul bem clarinho */
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-}
-
-/* FUNDOS */
-body.inicial {
-  background: #eef7ff;
-}
-
-body.ativo {
-  background: #eafaf1;
-}
-
-body.inativo {
-  background: #fdeeee;
 }
 
 /* CARD */
@@ -34,20 +21,36 @@ body.inativo {
   width: 92%;
   max-width: 420px;
   background: white;
-  border-radius: 22px;
+  border-radius: 25px;
   padding: 30px 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
   text-align: center;
+}
+
+/* TITULO */
+h1 {
+  font-size: 28px;
+  color: #0077cc;
+}
+
+/* TEXTO GRANDE */
+.nome {
+  font-size: 26px;
+  margin: 15px 0;
+}
+
+.tipo {
+  font-size: 20px;
+  color: #555;
 }
 
 /* STATUS */
 .status {
-  font-size: 30px;
+  font-size: 28px;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin-top: 20px;
 }
 
-/* CORES */
 .ok {
   color: #1e7e34;
 }
@@ -56,71 +59,51 @@ body.inativo {
   color: #c82333;
 }
 
-/* NOME */
-.nome {
-  font-size: 26px;
-  margin: 15px 0;
-}
-
-/* TIPO */
-.tipo {
+/* BOTÃO */
+button {
+  margin-top: 25px;
+  padding: 15px;
   font-size: 20px;
-  color: #555;
-}
-
-/* TEXTO */
-.loading {
-  font-size: 20px;
-  color: #666;
+  border: none;
+  border-radius: 12px;
+  background: #0077cc;
+  color: white;
+  width: 100%;
 }
 </style>
 </head>
 
-<body class="inicial">
+<body>
 
 <div class="card">
-  <div id="conteudo" class="loading">🔄 Verificando...</div>
+  <h1>Validação</h1>
+
+  <div id="conteudo">
+    <p style="font-size:20px;">Aguardando leitura do QR Code</p>
+  </div>
+
+  <button onclick="simularLeitura()">📷 Simular leitura do QR Code</button>
 </div>
 
 <script>
-const urlParams = new URLSearchParams(window.location.search);
-const id = urlParams.get("id");
+function simularLeitura() {
 
-fetch(`https://script.google.com/macros/s/AKfycbxXAUfFZn1HjwBC6qEwyBrh6pqzHwaG9Nb71x98qUa8X5ocJEyxa4zppjfZiCD-g6guHA/exec?id=${id}`)
-.then(res => res.json())
-.then(dados => {
+  // DADO SIMULADO
+  const dados = {
+    nome: "Maria Oliveira",
+    tipo: "Condômino",
+    status: "ATIVO"
+  };
 
-  if (dados.erro) {
-    document.body.className = "inativo";
-    document.getElementById("conteudo").innerHTML =
-      `<div class="status no">❌ NÃO ENCONTRADO</div>`;
-    return;
-  }
+  let classe = dados.status === "ATIVO" ? "ok" : "no";
+  let texto = dados.status === "ATIVO" ? "✔ DESCONTO LIBERADO" : "❌ NÃO AUTORIZADO";
 
-  if (dados.status === "ATIVO") {
-    document.body.className = "ativo";
-
-    document.getElementById("conteudo").innerHTML = `
-      <div class="status ok">✔ DESCONTO LIBERADO</div>
-      <div class="nome">${dados.nome}</div>
-      <div class="tipo">${dados.tipo}</div>
-    `;
-  } else {
-    document.body.className = "inativo";
-
-    document.getElementById("conteudo").innerHTML = `
-      <div class="status no">❌ NÃO AUTORIZADO</div>
-      <div class="nome">${dados.nome}</div>
-      <div class="tipo">${dados.tipo}</div>
-    `;
-  }
-
-})
-.catch(() => {
-  document.body.className = "inativo";
-  document.getElementById("conteudo").innerHTML =
-    `<div class="status no">⚠️ ERRO</div>`;
-});
+  document.getElementById("conteudo").innerHTML = `
+    <div class="status ${classe}">${texto}</div>
+    <div class="nome">${dados.nome}</div>
+    <div class="tipo">${dados.tipo}</div>
+  `;
+}
 </script>
 
 </body>
