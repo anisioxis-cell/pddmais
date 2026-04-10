@@ -3,21 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <title>Validação</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
-      font-family: Arial;
+      margin: 0;
+      font-family: Arial, sans-serif;
       text-align: center;
-      padding: 40px;
-      color: #333;
+      color: white;
     }
 
-    .card {
-      max-width: 400px;
-      margin: auto;
-      border-radius: 15px;
-      padding: 30px;
-      color: white;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    .container {
+      padding: 30px 20px;
+    }
+
+    .logo {
+      width: 120px;
+      margin-bottom: 20px;
     }
 
     .nome {
@@ -36,60 +38,65 @@
       font-weight: bold;
       padding: 10px;
       border-radius: 10px;
+      display: inline-block;
       background: rgba(255,255,255,0.2);
+    }
+
+    .erro {
+      font-size: 24px;
+      margin-top: 50px;
     }
   </style>
 </head>
+
 <body>
 
-<div id="card" class="card">
-  <div class="nome" id="nome"></div>
+<div class="container" id="app">
+  <img src="SUA_LOGO_AQUI" class="logo">
+
+  <div class="nome" id="nome">Carregando...</div>
   <div class="tipo" id="tipo"></div>
   <div class="status" id="status"></div>
 </div>
 
 <script>
-  const dados = {
-    "COND-0001": {nome: "João Silva", tipo: "Condômino", status: "ATIVO"},
-    "RES-0001": {nome: "Maria Souza", tipo: "Residente", status: "ATIVO"},
-    "COM-0001": {nome: "Mercadinho X", tipo: "Comércio", status: "ATIVO"},
-    "PRES-0001": {nome: "Carlos Eletricista", tipo: "Prestador", status: "INATIVO"}
-  };
-
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
+  const token = params.get("token");
 
-  const info = dados[id];
+  const urlAPI = "https://script.google.com/macros/s/AKfycbyAyks1E4bjB2sFLGFwb6b5w3uMuj7GAE0xgZGGtyhQvPiVq4_VULqsBjq93q9DgB2GAw/exec";
 
-  const card = document.getElementById("card");
+  fetch(urlAPI + "?id=" + id + "&token=" + token)
+    .then(res => res.json())
+    .then(data => {
+      const body = document.body;
 
-  if (info) {
-    document.getElementById("nome").innerText = info.nome;
-    document.getElementById("tipo").innerText = info.tipo;
-    document.getElementById("status").innerText = info.status;
+      if (data.erro) {
+        document.getElementById("app").innerHTML = "<div class='erro'>❌ NÃO ENCONTRADO</div>";
+        body.style.background = "#555";
+        return;
+      }
 
-    // CORES POR TIPO
-    if (id.startsWith("RES")) {
-      card.style.background = "#2196F3"; // azul
-    } else if (id.startsWith("COND")) {
-      card.style.background = "#6A1B9A"; // roxo
-    } else if (id.startsWith("COM")) {
-      card.style.background = "#FB8C00"; // laranja
-    } else if (id.startsWith("PRES")) {
-      card.style.background = "#2E7D32"; // verde
-    }
+      document.getElementById("nome").innerText = data.nome;
+      document.getElementById("tipo").innerText = data.tipo;
 
-    // STATUS
-    if (info.status === "ATIVO") {
-      document.getElementById("status").innerText = "✅ ATIVO";
-    } else {
-      document.getElementById("status").innerText = "❌ INATIVO";
-    }
+      if (data.status === "ATIVO") {
+        document.getElementById("status").innerText = "✅ ATIVO";
+      } else {
+        document.getElementById("status").innerText = "❌ INATIVO";
+      }
 
-  } else {
-    card.innerHTML = "<h2>❌ NÃO ENCONTRADO</h2>";
-    card.style.background = "#555";
-  }
+      // CORES POR TIPO
+      if (id.startsWith("RES")) {
+        body.style.background = "#2196F3"; // azul
+      } else if (id.startsWith("COND")) {
+        body.style.background = "#6A1B9A"; // roxo
+      } else if (id.startsWith("COM")) {
+        body.style.background = "#FB8C00"; // laranja
+      } else if (id.startsWith("PRES")) {
+        body.style.background = "#2E7D32"; // verde
+      }
+    });
 </script>
 
 </body>
