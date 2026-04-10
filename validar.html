@@ -10,40 +10,61 @@
       margin: 0;
       font-family: Arial, sans-serif;
       text-align: center;
-      color: white;
+      background: #E3F2FD;
+      color: #333;
     }
 
     .container {
       padding: 30px 20px;
     }
 
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      max-width: 350px;
+      margin: auto;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
     .logo {
       width: 120px;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     .nome {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: bold;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .tipo {
-      font-size: 18px;
-      margin-bottom: 20px;
+      font-size: 16px;
+      margin-bottom: 15px;
+      color: #666;
     }
 
     .status {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: bold;
-      padding: 10px;
+      padding: 12px;
       border-radius: 10px;
-      display: inline-block;
-      background: rgba(255,255,255,0.2);
+      margin-top: 10px;
+    }
+
+    .ativo {
+      background: #C8E6C9;
+      color: #2E7D32;
+    }
+
+    .inativo {
+      background: #FFCDD2;
+      color: #C62828;
     }
 
     .erro {
-      font-size: 24px;
+      font-size: 22px;
+      color: red;
       margin-top: 50px;
     }
   </style>
@@ -51,12 +72,17 @@
 
 <body>
 
-<div class="container" id="app">
-  <img src="https://link-da-sua-logo.png">
+<div class="container">
+  <div class="card" id="app">
 
-  <div class="nome" id="nome">Carregando...</div>
-  <div class="tipo" id="tipo"></div>
-  <div class="status" id="status"></div>
+    <!-- TROCAR PELA SUA LOGO -->
+    <img src="SUA_LOGO_AQUI" class="logo">
+
+    <div class="nome" id="nome">Carregando...</div>
+    <div class="tipo" id="tipo"></div>
+    <div id="status" class="status"></div>
+
+  </div>
 </div>
 
 <script>
@@ -69,33 +95,25 @@
   fetch(urlAPI + "?id=" + id + "&token=" + token)
     .then(res => res.json())
     .then(data => {
-      const body = document.body;
 
       if (data.erro) {
         document.getElementById("app").innerHTML = "<div class='erro'>❌ NÃO ENCONTRADO</div>";
-        body.style.background = "#555";
         return;
       }
 
       document.getElementById("nome").innerText = data.nome;
       document.getElementById("tipo").innerText = data.tipo;
 
+      const statusEl = document.getElementById("status");
+
       if (data.status === "ATIVO") {
-        document.getElementById("status").innerText = "✅ ATIVO";
+        statusEl.innerText = "✅ ATIVO";
+        statusEl.classList.add("ativo");
       } else {
-        document.getElementById("status").innerText = "❌ INATIVO";
+        statusEl.innerText = "❌ INATIVO";
+        statusEl.classList.add("inativo");
       }
 
-      // CORES POR TIPO
-      if (id.startsWith("RES")) {
-        body.style.background = "#2196F3"; // azul
-      } else if (id.startsWith("COND")) {
-        body.style.background = "#6A1B9A"; // roxo
-      } else if (id.startsWith("COM")) {
-        body.style.background = "#FB8C00"; // laranja
-      } else if (id.startsWith("PRES")) {
-        body.style.background = "#2E7D32"; // verde
-      }
     });
 </script>
 
