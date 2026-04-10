@@ -1,25 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Validação</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      padding: 40px;
+      color: #333;
+    }
+
+    .card {
+      max-width: 400px;
+      margin: auto;
+      border-radius: 15px;
+      padding: 30px;
+      color: white;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .nome {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .tipo {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .status {
+      font-size: 22px;
+      font-weight: bold;
+      padding: 10px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.2);
+    }
+  </style>
+</head>
+<body>
+
+<div id="card" class="card">
+  <div class="nome" id="nome"></div>
+  <div class="tipo" id="tipo"></div>
+  <div class="status" id="status"></div>
+</div>
+
 <script>
-const token = new URLSearchParams(window.location.search).get("token");
+  const dados = {
+    "COND-0001": {nome: "João Silva", tipo: "Condômino", status: "ATIVO"},
+    "RES-0001": {nome: "Maria Souza", tipo: "Residente", status: "ATIVO"},
+    "COM-0001": {nome: "Mercadinho X", tipo: "Comércio", status: "ATIVO"},
+    "PRES-0001": {nome: "Carlos Eletricista", tipo: "Prestador", status: "INATIVO"}
+  };
 
-fetch("https://script.google.com/macros/s/AKfycbw7qNgoVsEybKdUq1fdHFayLQKZmOfGHl6D2NTmfjkVpNkj6hN8KR16IiZoVeiJojDhNw/exec?token=" + token)
-.then(r => r.json())
-.then(dados => {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
 
-  if (dados.status === "ATIVO") {
-    document.body.style.background = "#eafaf1";
-    document.getElementById("conteudo").innerHTML = `
-      <div class="status ok">✔ DESCONTO LIBERADO</div>
-      <div class="nome">${dados.nome}</div>
-      <div class="tipo">${dados.tipo}</div>
-    `;
+  const info = dados[id];
+
+  const card = document.getElementById("card");
+
+  if (info) {
+    document.getElementById("nome").innerText = info.nome;
+    document.getElementById("tipo").innerText = info.tipo;
+    document.getElementById("status").innerText = info.status;
+
+    // CORES POR TIPO
+    if (id.startsWith("RES")) {
+      card.style.background = "#2196F3"; // azul
+    } else if (id.startsWith("COND")) {
+      card.style.background = "#6A1B9A"; // roxo
+    } else if (id.startsWith("COM")) {
+      card.style.background = "#FB8C00"; // laranja
+    } else if (id.startsWith("PRES")) {
+      card.style.background = "#2E7D32"; // verde
+    }
+
+    // STATUS
+    if (info.status === "ATIVO") {
+      document.getElementById("status").innerText = "✅ ATIVO";
+    } else {
+      document.getElementById("status").innerText = "❌ INATIVO";
+    }
+
   } else {
-    document.body.style.background = "#fdeeee";
-    document.getElementById("conteudo").innerHTML = `
-      <div class="status no">❌ SEM DIREITO A BENEFÍCIOS</div>
-      <div class="nome">${dados.nome}</div>
-      <div class="tipo">${dados.tipo}</div>
-    `;
+    card.innerHTML = "<h2>❌ NÃO ENCONTRADO</h2>";
+    card.style.background = "#555";
   }
-
-});
 </script>
+
+</body>
+</html>
