@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Validação</title>
+  <title>Validação da Carteirinha</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <style>
     body {
       margin: 0;
@@ -12,110 +11,106 @@
       text-align: center;
       background: #E3F2FD;
       color: #333;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-
     .container {
-      padding: 30px 20px;
+      padding: 20px;
     }
-
     .card {
       background: white;
       border-radius: 20px;
-      padding: 25px;
-      max-width: 350px;
+      padding: 30px 25px;
+      max-width: 380px;
       margin: auto;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 25px rgba(0,0,0,0.15);
     }
-
     .logo {
-      width: 120px;
-      margin-bottom: 15px;
+      width: 110px;
+      margin-bottom: 20px;
     }
-
     .nome {
       font-size: 26px;
       font-weight: bold;
-      margin-bottom: 8px;
+      margin: 10px 0 5px;
     }
-
     .tipo {
-      font-size: 16px;
-      margin-bottom: 15px;
+      font-size: 17px;
       color: #666;
+      margin-bottom: 20px;
     }
-
     .status {
-      font-size: 20px;
-      font-weight: bold;
-      padding: 12px;
-      border-radius: 10px;
-      margin-top: 10px;
-    }
-
-    .ativo {
-      background: #C8E6C9;
-      color: #2E7D32;
-    }
-
-    .inativo {
-      background: #FFCDD2;
-      color: #C62828;
-    }
-
-    .erro {
       font-size: 22px;
-      color: red;
-      margin-top: 50px;
+      font-weight: bold;
+      padding: 14px 30px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+    .ativo { background: #C8E6C9; color: #2E7D32; }
+    .inativo { background: #FFCDD2; color: #C62828; }
+    .erro {
+      font-size: 24px;
+      color: #d32f2f;
+      margin: 40px 0;
+    }
+    .loader {
+      font-size: 18px;
+      color: #666;
+      margin: 30px 0;
     }
   </style>
 </head>
-
 <body>
 
 <div class="container">
   <div class="card" id="app">
-
-    <!-- TROCAR PELA SUA LOGO -->
-    <img src="SUA_LOGO_AQUI" class="logo">
-
-    <div class="nome" id="nome">Carregando...</div>
-    <div class="tipo" id="tipo"></div>
-    <div id="status" class="status"></div>
-
+    <img src="SUA_LOGO_AQUI" class="logo" alt="Logo">
+    <div class="loader" id="loading">Validando carteirinha...</div>
   </div>
 </div>
 
 <script>
   const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
   const token = params.get("token");
 
-  const urlAPI = "https://script.google.com/macros/s/AKfycbyAyks1E4bjB2sFLGFwb6b5w3uMuj7GAE0xgZGGtyhQvPiVq4_VULqsBjq93q9DgB2GAw/exec";
+  const urlAPI = "https://script.google.com/macros/s/AKfycbzrB_8BDCAjvIfrLNIrjx56tEN9gul1B1AKlCilI5r65PvCLPmFdn0hnOTImtGgXnu_cA/exec";
 
-  fetch(urlAPI + "?id=" + id + "&token=" + token)
+  if (!token) {
+    document.getElementById("app").innerHTML = `<div class="erro">❌ QR Code inválido ou sem token</div>`;
+    return;
+  }
+
+  fetch(urlAPI + "?token=" + encodeURIComponent(token))
     .then(res => res.json())
     .then(data => {
+      document.getElementById("loading").style.display = "none";
 
       if (data.erro) {
-        document.getElementById("app").innerHTML = "<div class='erro'>❌ NÃO ENCONTRADO</div>";
+        document.getElementById("app").innerHTML = `<div class="erro">❌ ${data.erro}</div>`;
         return;
       }
 
-      document.getElementById("nome").innerText = data.nome;
-      document.getElementById("tipo").innerText = data.tipo;
-
-      const statusEl = document.getElementById("status");
+      // Sucesso - mostra os dados
+      let html = `
+        <img src="SUA_LOGO_AQUI" class="logo" alt="Logo">
+        <div class="nome">${data.nome}</div>
+        <div class="tipo">ID: ${data.id} • ${data.tipo}</div>
+      `;
 
       if (data.status === "ATIVO") {
-        statusEl.innerText = "✅ ATIVO";
-        statusEl.classList.add("ativo");
+        html += `<div class="status ativo">✅ ASSOCIADO ATIVO</div>`;
       } else {
-        statusEl.innerText = "❌ INATIVO";
-        statusEl.classList.add("inativo");
+        html += `<div class="status inativo">❌ INATIVO</div>`;
       }
 
+      document.getElementById("app").innerHTML = html;
+    })
+    .catch(err => {
+      document.getElementById("loading").style.display = "none";
+      document.getElementById("app").innerHTML = `<div class="erro">❌ Erro de conexão</div>`;
     });
 </script>
-
 </body>
 </html>
