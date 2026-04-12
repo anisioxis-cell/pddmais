@@ -1,10 +1,157 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-<meta http-equiv="refresh" content="0; url=validar.html">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Carteirinha Digital - ASSO PDD+</title>
+    <script src="https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #002a5c, #1e5cb8);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+        .carteirinha {
+            width: 100%;
+            max-width: 380px;
+            background: linear-gradient(to bottom, #f8fbff, #e0f0ff);
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.4);
+        }
+        .topo {
+            background: #003087;
+            color: white;
+            text-align: center;
+            padding: 18px 15px 12px;
+        }
+        .logo {
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 10px;
+            border: 5px solid white;
+            border-radius: 50%;
+        }
+        .conteudo {
+            padding: 22px 25px 30px;
+            color: #003087;
+        }
+        .residente {
+            background: #003087;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
+            font-size: 1.15em;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .info {
+            display: flex;
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+        .foto {
+            width: 125px;
+            height: 160px;
+            border: 4px solid #003087;
+            background: #ccc center/cover no-repeat;
+            flex-shrink: 0;
+            border-radius: 8px;
+        }
+        .dados {
+            flex: 1;
+            line-height: 1.8;
+        }
+        .nome {
+            font-size: 1.6em;
+            font-weight: bold;
+        }
+        #qrcode {
+            margin: 0 auto 20px;
+            padding: 15px;
+            background: white;
+            border: 4px solid #003087;
+            border-radius: 15px;
+            width: fit-content;
+        }
+        .validade, .site {
+            text-align: center;
+            color: #003087;
+        }
+        .validade { font-weight: bold; font-size: 1.05em; margin-bottom: 8px; }
+    </style>
 </head>
 <body>
-Redirecionando...
+
+<div class="carteirinha">
+    <div class="topo">
+        <img src="pddmais.png" class="logo" alt="Logo PDD+">
+        <div>ASSOCIAÇÃO DOS MORADORES<br>DO PORTO DAS DUNAS</div>
+        <div>AQUIRAZ - CE - BRASIL</div>
+    </div>
+
+    <div class="conteudo">
+        <div class="residente">CARTEIRINHA DE ASSOCIADO - RESIDENTE</div>
+        
+        <div class="info">
+            <div class="foto" id="foto"></div>
+            <div class="dados">
+                <div class="nome" id="nome">Carregando...</div>
+                <div id="id"></div>
+                <div id="telefone"></div>
+            </div>
+        </div>
+
+        <div id="qrcode"></div>
+
+        <div class="validade" id="validade">VÁLIDO ATÉ 04/02/2027</div>
+        <div class="site">assopddmais.com.br</div>
+    </div>
+</div>
+
+<script>
+    // === NOVO LINK DA API ===
+    const apiUrl = "https://script.google.com/macros/s/AKfycbw50_ZQbNKu9UiUIW4hE7sWRsGI2MssiY9ePAcGsQdHSpTBEg-njk4C_MZ-ZVTEyaf3Rg/exec";
+    
+    const params = new URLSearchParams(window.location.search);
+    const idAssociado = params.get("id") || "RES-0001";
+
+    fetch(apiUrl + "?id=" + encodeURIComponent(idAssociado))
+        .then(r => r.json())
+        .then(data => {
+            if (data.erro) {
+                document.getElementById("nome").textContent = "Erro ao carregar";
+                return;
+            }
+
+            document.getElementById("nome").textContent = data.nome || "Nome não encontrado";
+            document.getElementById("id").textContent = data.id || idAssociado;
+            // document.getElementById("foto").style.backgroundImage = "url('sua-foto.jpg')"; // quando tiver foto
+
+            gerarQRCode(data.token);
+        })
+        .catch(() => {
+            document.getElementById("nome").textContent = "Erro de conexão";
+        });
+
+    function gerarQRCode(token) {
+        const container = document.getElementById("qrcode");
+        container.innerHTML = "";
+
+        new QRCodeStyling({
+            width: 235,
+            height: 235,
+            data: `validar.html?token=${token}`,
+            dotsOptions: { color: "#003087", type: "rounded" },
+            backgroundOptions: { color: "#ffffff" }
+        }).append(container);
+    }
+</script>
 </body>
 </html>
