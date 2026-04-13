@@ -372,7 +372,8 @@
   </div>
 
   <!-- BOTÃO LER -->
-  <button class="btn-qr" id="btn-ler" onclick="abrirScanner()">
+  <input type="file" id="input-camera" accept="image/*" capture="environment" style="display:none" onchange="lerImagemQR(this)">
+  <button class="btn-qr" id="btn-ler" onclick="document.getElementById('input-camera').click()">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
       <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
       <rect x="3" y="14" width="7" height="7" rx="1"/>
@@ -626,6 +627,47 @@
       <svg viewBox="0 0 34 34" fill="none" stroke="#b03030" stroke-width="2.8">
         <path d="M8 8l18 18M26 8L8 26" stroke-linecap="round"/>
       </svg>`;
+  }
+
+  function lerImagemQR(input) {
+    const file = input.files[0];
+    if (!file) return;
+    mostrarCarregando();
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const c = document.createElement('canvas');
+        c.width = img.width;
+        c.height = img.height;
+        const ctx2 = c.getContext('2d');
+        ctx2.drawImage(img, 0, 0);
+        const imageData = ctx2.getImageData(0, 0, c.width, c.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+        if (code && code.data) {
+          processarQR(code.data);
+        } else {
+          // QR não detectado na imagem — tenta de novo
+          document.getElementById("resultado-card").className = "resultado-card negado";
+          document.getElementById("icon-wrap").className = "icon-status negado";
+          document.getElementById("icon-wrap").innerHTML = `
+            <svg viewBox="0 0 34 34" fill="none" stroke="#b03030" stroke-width="2.8">
+              <path d="M8 8l18 18M26 8L8 26" stroke-linecap="round"/>
+            </svg>`;
+          document.getElementById("status-titulo").textContent = "QR Code não lido";
+          document.getElementById("assoc-nome").textContent = "Tente fotografar mais de perto";
+          document.getElementById("assoc-meta").textContent = "Centralize o QR Code na foto";
+          document.getElementById("assoc-badge").textContent = "Tente novamente";
+          document.getElementById("timestamp").textContent = "";
+          mostrar(["assoc-nome","assoc-meta","assoc-badge","btn-nova"]);
+        }
+        // Limpa o input para permitir nova leitura
+        input.value = "";
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
   }
 
   function mostrar(ids) { ids.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = ""; }); }
