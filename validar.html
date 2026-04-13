@@ -419,26 +419,61 @@
   }
 
   function abrirScanner() {
-    document.getElementById("scanner-overlay").classList.add("ativo");
     const video = document.getElementById("video");
 
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      alert("Câmera não suportada neste navegador.");
-      fecharScanner();
+      mostrarErroCamara("Câmera não suportada. Use o Chrome atualizado.");
       return;
     }
 
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-      .then(s => {
-        stream = s;
-        video.srcObject = s;
-        video.play();
-        iniciarScan(video);
-      })
-      .catch(err => {
-        alert("Não foi possível acessar a câmera: " + err.message);
+    document.getElementById("scanner-overlay").classList.add("ativo");
+
+    const constraints = [
+      { video: { facingMode: { exact: "environment" } } },
+      { video: { facingMode: "environment" } },
+      { video: true }
+    ];
+
+    function tentarConstraint(index) {
+      if (index >= constraints.length) {
         fecharScanner();
-      });
+        mostrarErroCamara("negada");
+        return;
+      }
+      navigator.mediaDevices.getUserMedia(constraints[index])
+        .then(s => {
+          stream = s;
+          video.srcObject = s;
+          video.play();
+          iniciarScan(video);
+        })
+        .catch(err => {
+          if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+            fecharScanner();
+            mostrarErroCamara("negada");
+          } else {
+            tentarConstraint(index + 1);
+          }
+        });
+    }
+
+    tentarConstraint(0);
+  }
+
+  function mostrarErroCamara(tipo) {
+    const card = document.getElementById("resultado-card");
+    card.className = "resultado-card negado";
+    document.getElementById("icon-wrap").className = "icon-status negado";
+    document.getElementById("icon-wrap").innerHTML = `
+      <svg viewBox="0 0 34 34" fill="none" stroke="#b03030" stroke-width="2.8">
+        <path d="M8 8l18 18M26 8L8 26" stroke-linecap="round"/>
+      </svg>`;
+    document.getElementById("status-titulo").textContent = "Câmera bloqueada";
+    document.getElementById("assoc-nome").textContent = "Permissão necessária";
+    document.getElementById("assoc-meta").textContent = "Toque no 🔒 cadeado na barra de endereço";
+    document.getElementById("assoc-badge").textContent = "Câmera → Permitir → Recarregue";
+    document.getElementById("timestamp").textContent = "Chrome: Configurações do site → Câmera → Permitir para este site";
+    mostrar(["assoc-nome","assoc-meta","assoc-badge","timestamp","btn-nova"]);
   }
 
   function fecharScanner() {
